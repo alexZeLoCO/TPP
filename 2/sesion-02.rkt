@@ -2,7 +2,7 @@
 ;;; * SESIÓN-02 *
 ;;; *************
 
-
+(require racket/trace)
 (require mzlib/compat)         ; Importa una biblioteca. En particular, nos
                                ; permite utilizar la función atom? que, en
                                ; otro caso, no estaría disponible
@@ -356,6 +356,7 @@
         [else #f]
         )
   )
+(trace existe?)
 
 (displayln "existe?")
 (existe?  'a '((a b (a)) (e) c))     ;=> #t
