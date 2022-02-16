@@ -24,13 +24,12 @@
                 ))
 
 (define una-persona (cadr Datos))
-(display "Ejemplo:\n")
+(display "Ejemplo: ")
 (writeln una-persona)
 
 ;; Además se proporcionan las siguientes funciones para acceder a la
 ;; información:
 
-(display "\nFunciones:\n")
 (define (get-nombre p)
   (car p))
 
@@ -73,7 +72,6 @@
 (display "trabaja? ")
 (trabaja? una-persona)  ;=> #t
 
-(display "\nApartado 1\n")
 ;;----------------------------------------------------------------------
 ;; 1 - Aplicando la función Extrae
 ;;----------------------------------------------------------------------
@@ -111,7 +109,7 @@
 ;; funciones de acceso predefinidas, para obtener de Datos la siguiente información:
 
 ;a) Los nombres de los adultos
-(display "a) (Extrae)")
+
 (Extrae Datos (lambda (p) (>= (get-edad p) 18)) get-nombre)
 ;=> (LUIS MARIA ADOLFO ANA JOSE)
 
@@ -120,7 +118,6 @@
 ;; de filtrado, filtra exactamente los mismos datos, pero proporciona toda la información conocida
 ;; relativa a éstos:
 
-(display "a) (filter)")
 (filter (lambda (p) (>= (get-edad p) 18)) Datos)
 ;=> ((LUIS GARCIA PEREZ 26 V (INFORMATICA MEDICINA) #t)
 ;    (MARIA LUZ DIVINA 23 M (INFORMATICA) #t)
@@ -132,37 +129,30 @@
 ;; requeriría un procesamiento posterior de éstos (el formateo).
 
 ;b) La lista de nombres completos de todos
-(display "b)")
-(Extrae Datos (lambda (p) (number? (get-edad p))) get-nombre-completo)
+
 
 
 ;c) Los nombres de todas las mujeres que trabajan
-(display "c)")
-(Extrae Datos (lambda (p) (and (eq? (get-genero p) 'M) (trabaja? p))) get-nombre)
 
 
 
 ;d) Los nombres completos de todos los que han estudiado INFORMATICA
-(display "d)")
-(Extrae Datos (lambda (p) (member 'INFORMATICA (get-estudios p))) get-nombre-completo)
+
 
 
 ;e) Los pares (género edad) de todas las personas sin estudios
-(display "e)")
-(Extrae Datos (lambda (p) (empty? (get-estudios p))) (lambda (persona) (cons (get-genero persona) (get-edad persona))))
+
 
 
 ;f) La edad de todos los INFORMATICOS
-(display "f)")
-(Extrae Datos (lambda (p) (member 'INFORMATICA (get-estudios p))) get-edad)
+
 
 
 ;g) La lista de nombres completos de todas las personas sin trabajo
-(display "g)")
-(Extrae Datos (lambda (p) (not (trabaja? p))) get-nombre-completo)
 
 
-(display "\nApartado 2\n")
+
+
 ;; ----------------------------------------------------------
 ;: 2 - FUNCION gen-filtro
 ;;-----------------------------------------------------------
@@ -201,38 +191,46 @@
 (define informaticos
   (gen-filtro (lambda (p) (get-estudios p)) member 'INFORMATICA))
 
-(display "Ejemplo:")
 (Extrae Datos informaticos get-nombre)
 
 ;a) Los nombres de los adultos
-(display "a) Nombres de adultos")
-(Extrae Datos (gen-filtro get-edad < '18) get-nombre)
+
+
+
 
 ;b) La lista de nombres completos de todos
-(display "b) Nombres completos de todos")
-(Extrae Datos (gen-filtro get-edad < -1) get-nombre-completo)
+
+
+
 
 ;c) Los nombres de todas las mujeres que trabajan
-(display "c) Nombres de mujeres que trabajan")
-(Extrae Datos (gen-filtro (lambda (p) (and (trabaja? p) (get-genero p))) eq? 'M) get-nombre)
+
+
+
 
 ;d) Los nombres completos de todos los que han estudiado INFORMATICA
-(display "d) Nombres completos de informáticos")
-(Extrae Datos (gen-filtro get-estudios member 'INFORMATICA) get-nombre-completo)
+
+
+
 
 ;e) Los pares (género edad) de todas las personas sin estudios
-(display "e) Pares género edad de personas sin estudios")
-(Extrae Datos (gen-filtro get-estudios eq? '()) (lambda (persona) (cons (get-genero persona) (get-edad persona))))
+
+
+
 
 ;f) La edad de todos los INFORMATICOS
-(display "f) Edad de informáticos")
-(Extrae Datos (gen-filtro get-estudios member 'INFORMATICA) get-edad)
+
+
+
 
 ;g) La lista de nombres completos de todas las personas sin trabajo
-(display "g) Nombres completos de personas sin trabajo")
-(Extrae Datos (gen-filtro trabaja? eq? #f) get-nombre-completo)
 
-(display "\nComplementarios\n")
+
+
+
+
+
+
 ;;;----------------------------------------------------------------------------------------
 ;;; EJERCICIOS COMPLEMENTARIOS
 ;;;----------------------------------------------------------------------------------------
@@ -247,42 +245,35 @@
 
 ;a) Obtener todos los números con más de 3 dígitos
 ;   ((n2 (3 4 9 0 1)) (n3 (3 0 3 4)))
-(display "a) Números de mas de 3 dígitos")
-(filter (lambda (n) (> (length (cadr n)) 3)) numeros)
+
 
 
 ;b) Obtener todos los números que tengan un siete
 ;   ((n1 (3 7 3)) (n4 (7)))
-(display "b) Números que contengan un 7")
-(filter (lambda (n) (member 7 (cadr n))) numeros)
+
 
 
 ;c) Obtener todos los números que tengan como primer dígito un 3
 ;   ((n1 (3 7 3)) (n2 (3 4 9 0 1)) (n3 (3 0 3 4)))
-(display "c) Números cuyo primer dígito sea 3")
-(filter (lambda (n) (eq? (caadr n) 3)) numeros)
+
 
 
 ;d) Obtener todos los números cuya suma de dígitos sea menor que 12
 ;   ((n3 (3 0 3 4)) (n4 (7)))
-(display "d) Números cuya suma de dígitos sea menor que 12")
-(filter (lambda (n) (< (apply + (cadr n)) 12)) numeros)
 
 
-(display "\nDefiniciones de funciones\n")
+
+
 ;------------------------------------------------------
 ; Define mediante FOS la función frecuency(x, l) que
 ; retorna el número de repeticiones de x en la lista l
 ;------------------------------------------------------
 ;
 
-(define (frecuency x l)
-  (length (filter (lambda (n) (equal? n x)) l))
-  )
 
 
-(display "frecuency: ")
-(frecuency '(a) '(a b (a) a d (a))) ; => 2
+;(display "frecuency: ")
+;(frecuency1 '(a) '(a b (a) a d (a))) ; => 2
 
 ;------------------------------------------------------
 ; Define la función recursiva filterec(f, L) que, dada
@@ -291,15 +282,10 @@
 ;-------------------------------------------------------
 ;
 
-(define (filterec f l)
-  (cond [(empty? l) '()]
-        [(f (car l)) (cons (car l) (filterec f (cdr l)))]
-        [else (filterec f (cdr l))]
-        )
-  )
 
-(display "filtered: ")
-(filterec list? '(1 (2) ((a)) 3))  ; => ((2) ((a)))
+
+;(display "filtered: ")
+;(filterec list? '(1 (2) ((a)) 3))  ; => ((2) ((a)))
 
 ;------------------------------------------------------
 ; Define la función recursiva for-all(f, L) que retorna
@@ -308,16 +294,11 @@
 ;-------------------------------------------------------
 ;
 
-(define (for-all f l)
-  (cond [(empty? l) '()]
-        [else (cons (f (car l)) (for-all f (cdr l)))]
-        )
-  )
 
-(display "for-all: ")
-(for-all cadr '((a b) ((a) c) (d (e)))) ;  => (b c (e))
 
-(display "\nFuncion revision integridad persona")
+;(display "for-all: ")
+;(for-all cadr '((a b) ((a) c) (d (e)))) ;  => (b c (e))
+
 ;----------------------------------------------------------------------
 ; Utiliza las funciones dadas al principio, que extraen información
 ; del símbolo definido Datos, para definir la función persona?(p)
@@ -332,35 +313,12 @@
 ;----------------------------------------------------------------------
 ;
 
-; Atomo ==> No par y no lista vacía:
-(define (atom? x)
-  (and (not (null? x))
-       (not (pair? x))
-       )
-  )
 
-(define (persona? p)
-  (and (eq? (length p) (length (car Datos))) ; Revisar longitud (7)
-       (atom? (get-nombre p)) ; Revisar nombre
-       (atom? (car (get-apellidos p))) ; Revisar apellido 1
-       (atom? (cadr (get-apellidos p))) ; Revisar apellido 2
-       (and (number? (get-edad p)) ; Revisar edad
-            (< 0 (get-edad p)) ; Revisar validez
-            )
-       (and (atom? (get-genero p)) ; Revisar género
-            (or (eq? 'M (get-genero p)) ; Género = M
-                (eq? 'V (get-genero p)) ; Género = V
-                )
-            )
-       (list? (get-estudios p)) ; Revisar estudios
-       (boolean? (trabaja? p)) ; Revisar trabajo
-       )
-  )
 
-(persona? '(MARIA LUZ DIVINA 23 M (INFORMATICA) #t))    ; => #t
-(persona? '(MARIA LUZ DIVINA 2 3 M (INFORMATICA) #t))   ; => #f
-(persona? '(MARIA (LUZ DIVINA) 23 M (INFORMATICA) #t))  ; => #f
-(persona? '(MARIA LUZ DIVINA 23 M INFORMATICA #t))      ; => #f
-(persona? '(MARIA LUZ DIVINA 23 H (INFORMATICA) #t))    ; => #f
 
-(map persona? Datos)
+;(persona? '(MARIA LUZ DIVINA 23 M (INFORMATICA) #t))    ; => #t
+;(persona? '(MARIA LUZ DIVINA 2 3 M (INFORMATICA) #t))   ; => #f
+;(persona? '(MARIA (LUZ DIVINA) 23 M (INFORMATICA) #t))  ; => #f
+;(persona? '(MARIA LUZ DIVINA 23 M INFORMATICA #t))      ; => #f
+;(persona? '(MARIA LUZ DIVINA 23 H (INFORMATICA) #t))    ; => #f
+
