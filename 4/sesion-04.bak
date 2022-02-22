@@ -131,9 +131,8 @@
 
 (displayln "Extrae:")
 
-(define (Extrae datos filtro formato)
-  (map formato (filter filtro datos))
-  )
+
+
 
 (define numeros
   '((n1 (3 7 3))(n2 (3 4 9 0 1))(n3 (3 0 3 4)) (n4 (7))))
@@ -143,8 +142,8 @@
 (filter (lambda(x) (> (length (cadr x)) 3)) numeros)
 
 ; Obtener los nombres de todos los números con más de 3 dígitos
-(display "nombres: ")
-(Extrae numeros (lambda(x) (> (length (cadr x)) 3)) car)
+;(display "nombres: ")
+;(Extrae numeros (lambda(x) (> (length (cadr x)) 3)) car)
 
 ; o bien
 (map car (filter (lambda(x) (> (length (cadr x)) 3)) numeros))
@@ -179,37 +178,18 @@
 ;
 
 ; Proporcionar una nueva versión de la función union(A, B) comprobando
-; previamente que su número de argumentos es el esperado y que éstos
+; previamente que su número de argumentos es el esparado y que éstos
 ; son válidos. En caso de no ser así, se proporcionará el mensaje
 ; de error correspondiente.
 ;
 ; Nota: deberá darse una única definición de función
 
-(define union               
-  (lambda resto                    
-    (letrec ([f (lambda (A B)    
-                 (cond [(null? A) B]
-	[(member (car A) B)
-         (union (cdr A) B)]
-	[else (cons (car A)
-                    (union (cdr A) B))]))
-                  
-                ]
-             )
-      (cond ([not (= (length resto) 2)]
-             (error "union(A, B): requiere dos argumentos"))
-            ([not (list? (car resto))]
-             (error "union(A, B): el primer argumento debe ser una lista"))
-            ([not (list? (cadr resto))]
-             (error "union(A, B): el segundo argumento debe ser una lista"))
-            (else
-             (f (car resto) (cadr resto)))))))
 
 
-(display "union: ")
-;(union '(c a x) 3)       ;=> error (OK)
-;(union '(c a x))         ;=> error (OK)
-(union '(c a x) '(a (a))) ;=> (c x a (a))
+;(display "union: ")
+;(union '(c a x) 3)       ;=> error
+;(union '(c a x))         ;=> error
+;(union '(c a x) '(a (a))) ;=> (c x a (a))
 
 ; Dado que la validación de argumentos siempre se realiza de la misma
 ; forma, resulta más conveniente centrase en el uso de las FOS. Así, en
@@ -230,12 +210,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-(define (union A B)
-  (append A (filter (lambda (x) (not (member x A))) B))
-  )
 
-(display "union: ")
-(union '(c a x) '(a (a))) ;=> (c x a (a))
+
+;(display "union: ")
+;(union '(c a x) '(a (a))) ;=> (c x a (a))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; subset?(A,B) = ¿A esta contenido en B?
@@ -243,17 +221,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-(define (subset?Rec A B)
-  (or (null? A)(_and (member (car A) B) (subset? (cdr A) B)))
-  )
 
-(define (subset? A B)
-  (equal? (filter (lambda (x) (member x B)) A) A)
-  )
 
-(displayln "subset:")
-(subset? '(c b) '(a x b d c y))    ;=> #t
-(subset? '(c b) '(a x b d (c) y))  ;=> #f
+;(displayln "subset:")
+;(subset? '(c b) '(a x b d c y))    ;=> #t
+;(subset? '(c b) '(a x b d (c) y))  ;=> #f
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; subset2?(A,B) = ¿A esta contenido en B?
@@ -263,12 +235,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-(define (subset2? A B)
-  (apply _and (map (lambda (x) (member x B)) A))
-  )
-   
-(subset2? '(c b) '(a x b d c y))    ;=> #t
-(subset2? '(c b) '(a x b d (c) y))  ;=> #f
+
+
+;(displayln "subset2?:")
+;(subset2? '(c b) '(a x b d c y))    ;=> #t
+;(subset2? '(c b) '(a x b d (c) y))  ;=> #f
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Redefine la nueva función union(A, B) dada aquí
@@ -280,26 +251,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 
-(define union
-    (lambda resto                    
-    (letrec ([f (lambda (A B)    
-                 (append A (filter (lambda (x) (not (member x A))) B))
-                  )
-                ]
-             )
-            (cond ([not (= (length resto) 2)]
-             (error "union(A, B): requiere dos argumentos"))
-            ([not (list? (car resto))]
-             (error "union(A, B): el primer argumento debe ser una lista"))
-            ([not (list? (cadr resto))]
-             (error "union(A, B): el segundo argumento debe ser una lista"))
-            (else
-             (f (car resto) (cadr resto)))))))
 
-(display "union: ")
-;(union '(c a x) 3)       ;=> error (OK)
-;(union '(c a x))         ;=> error (OK)
-(union '(c a x) '(a (a))) ;=> (c x a (a))
+;(display "union: ")
+;(union '(c a x) 3)       ;=> error
+;(union '(c a x))         ;=> error
+;(union '(c a x) '(a (a))) ;=> (c x a (a))
 
 ;;;------------------------------------------------------------------------
 ;;; EJERCICIOS COMPLEMENTARIOS
@@ -323,13 +279,12 @@
 ;;
 ;; suma-aritmetica(a, r, n): que retorna la suma de los n primeros términos
 ;; de la sucesión aritmética cuyo primer elemento es a y de razón r.
-;; ( a*r + (a+1)*r + (a+2)*r + ... + (a+n-1)*r )
 ;;
 ;; pares(a, b: retorna la lista de números pares en el rango [a, b] de
 ;; enteros
 ;;
 ;; multiplos(a, b, n): retorna la lista de todos los múltiplos del entero
-;; n que pertenecen al rango [a, b] de enteros. Si n=0 retorna la lista de
+;; n que pertenecen al rango [a, b] de enteros. Si n=0 retorna la lista d
 ;; enteros del rango dado.
 ;;------------------------------------------------------------------------------------
 
@@ -344,51 +299,45 @@
 
 ;;;;;;;;;;;;;;;;;;;;;
 
-(define (sucAritm0 r n)
-  (map (lambda (x) (* x r)) (enteros 0 n) )
-  )
 
-(display "sucAritm0: ")
-(sucAritm0 3 5)  ;=> (0 3 6 9 12)
 
-;;;;;;;;;;;;;;;;;;;;;
 
-(define (suc-aritmetica a r n)
-  (map (lambda (x) (+ a (* x r))) (enteros 0 n))
-  )
-
-(display "suc-aritmetica: ")
-(suc-aritmetica -7 3 5)   ;=> (-7 -4 -1 2 5)
+;(display "sucAritm0: ")
+;(sucAritm0 3 5)  ;=> (0 3 6 9 12)
 
 ;;;;;;;;;;;;;;;;;;;;;
 
-(define (suma-aritmetica a r n)
-  (apply + (suc-aritmetica a r n))
-  )
 
-(display "suma-aritmetica: ")
-(suma-aritmetica -7 3 5)   ;=> -5
 
-;;;;;;;;;;;;;;;;;;;;;
 
-(define (pares a b)
-  (filter even? (enteros a (add1 b)))
-  )
-
-(display "pares: ")
-(pares -7 9)   ;=> (-6 -4 -2 0 2 4 6 8)
+;(display "suc-aritmetica: ")
+;(suc-aritmetica -7 3 5)   ;=> (-7 -4 -1 2 5)
 
 ;;;;;;;;;;;;;;;;;;;;;
 
-; resto remainder
-(define (multiplos a b n)
-  (filter (lambda (x) (zero? (remainder n x))) (enteros a b)) ;WIP
-  )
 
-(displayln "multiplos: ")
-(multiplos -7 9 2)    ;=> (-6 -4 -2 0 2 4 6 8)
-(multiplos -30 30 7)  ;=> (-28 -21 -14 -7 0 7 14 21 28)
-(multiplos 1 10 0)  ;=> (1 2 3 4 5 6 7 8 9 10)
+
+
+;(display "suma-aritmetica: ")
+;(suma-aritmetica -7 3 5)   ;=> -5
+
+;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+;(display "pares: ")
+;(pares -7 9)   ;=> (-6 -4 -2 0 2 4 6 8)
+
+;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+;(displayln "multiplos: ")
+;(multiplos -7 9 2)    ;=> (-6 -4 -2 0 2 4 6 8)
+;(multiplos -30 30 7)  ;=> (-28 -21 -14 -7 0 7 14 21 28)
+;multiplos 1 10 0)  ;=> (1 2 3 4 5 6 7 8 9 10)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; cambia-si(l1, l2, f-cond)
