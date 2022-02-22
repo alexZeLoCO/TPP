@@ -291,6 +291,10 @@
 ;-------------------------------------------------------
 ;
 
+(define (filterecBis f l)
+  (filter f l)
+  )
+
 (define (filterec f l)
   (cond [(empty? l) '()]
         [(f (car l)) (cons (car l) (filterec f (cdr l)))]
@@ -301,12 +305,19 @@
 (display "filtered: ")
 (filterec list? '(1 (2) ((a)) 3))  ; => ((2) ((a)))
 
+(display "filteredBis")
+(filterecBis list? '(1 (2) ((a)) 3))  ; => ((2) ((a)))
+
 ;------------------------------------------------------
 ; Define la función recursiva for-all(f, L) que retorna
 ; la lista resultante de aplicar la función f a cada uno
 ; de los elementos de la lista
 ;-------------------------------------------------------
 ;
+
+(define (for-allBis f l)
+  (map f l)
+  )
 
 (define (for-all f l)
   (cond [(empty? l) '()]
@@ -316,6 +327,9 @@
 
 (display "for-all: ")
 (for-all cadr '((a b) ((a) c) (d (e)))) ;  => (b c (e))
+
+(display "for-allBis: ")
+(for-allBis cadr '((a b) ((a) c) (d (e)))) ;  => (b c (e))
 
 (display "\nFuncion revision integridad persona")
 ;----------------------------------------------------------------------
@@ -340,19 +354,22 @@
   )
 
 (define (persona? p)
-  (and (eq? (length p) (length (car Datos))) ; Revisar longitud (7)
+  (and (equal? (length p) 7) ; Revisar longitud (7)
        (atom? (get-nombre p)) ; Revisar nombre
+       (list? (get-apellidos p)) ; Revisar apellidos
+       (equal? (length (get-apellidos p)) 2) ; Revisar no apellidos
        (atom? (car (get-apellidos p))) ; Revisar apellido 1
        (atom? (cadr (get-apellidos p))) ; Revisar apellido 2
-       (and (number? (get-edad p)) ; Revisar edad
-            (< 0 (get-edad p)) ; Revisar validez
-            )
-       (and (atom? (get-genero p)) ; Revisar género
-            (or (eq? 'M (get-genero p)) ; Género = M
-                (eq? 'V (get-genero p)) ; Género = V
-                )
-            )
+       (number? (get-edad p)) ; Revisar edad
+       (or (positive? (get-edad p)) ; Revisar edad es positiva
+           (zero? (get-edad p)) ; ó 0
+           )
+       (atom? (get-genero p)) ; Revisar género
+       (or (equal? 'M (get-genero p)) ; Género = M
+           (equal? 'V (get-genero p)) ; Género = V
+        )
        (list? (get-estudios p)) ; Revisar estudios
+       (equal? (length (get-estudios p)) (length (filter atom? (get-estudios p)))) ; Revisar lista formada por átomos
        (boolean? (trabaja? p)) ; Revisar trabajo
        )
   )
