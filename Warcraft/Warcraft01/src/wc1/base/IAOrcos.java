@@ -27,6 +27,13 @@ public class IAOrcos {
 		return grupoDeAtaque;
 	}
 
+	/**
+	 * Gennera un grupo de ataque de la I.A.
+	 * Abstraido del original para aceptar ambos tipos de especies.
+	 * 
+	 * @param especie Tipo de especie a generar ('Orcos' o 'Humanos')
+	 * @return Un grupo de ataque de la especie especificada
+	 */
 	public Unidad[] creaGrupoDeAtaque(String especie) {
 		FAbstracta fa;
 		Unidad[] grupoDeAtaque = new Unidad[10];
