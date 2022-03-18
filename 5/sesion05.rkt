@@ -248,17 +248,16 @@
 ;; elementos de la lista l según la función de ordenación f
 
 (define (presentar datos orden)
-  (map (lambda (o) (sort o  (lambda (x y) (not (member (car x) ; Member funciona como drop-until, si encuentra el elemento, retorna el resto de la lista. Falso si no.
+  (map (lambda (o) (sort o (lambda (x y) (not (member (car x) ; Member funciona como drop-until, si encuentra el elemento, retorna el resto de la lista. Falso si no.
                                                        (member (car y) orden)
                                                 )
                                            )
                               )
                          )
          )datos
-          )
-                                                                               
+          )                                                                            
   )
-
+        
 (displayln "presentar:")
 (presentar Datos '(nombre apellidos edad sexo estudios en_activo))
 
@@ -322,11 +321,14 @@
 ;; fill(x, (a b)) = ( (x a b) (a x b) (a b x) )
 ;;-------------------------------------------------------------------------
 
+(define (fill x l)
+  (cond [(empty? l) (list x)]
+        [else (cons (cons x l) (cons (car l) (fill x (cdr l))))]
+        )
+)
 
-
-;(display "fill: ")
-;(fill 'x '(a (b c) d)) ; => ((x a (b c) d) (a x (b c) d) (a (b c) x d) (a (b c) d x))
-
+(display "fill: ")
+(fill 'x '(a (b c) d)) ; => ((x a (b c) d) (a x (b c) d) (a (b c) x d) (a (b c) d x))
 
 ;; Dar una versión currificada de la función fill
 
