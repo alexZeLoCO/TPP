@@ -13,6 +13,12 @@ public class Servidor {
 				(o, x) -> ((SaludadorOOS)o).cambiaSaludo(x[0].toString()));
 		com.addAction("reset", 
 				(o, x) -> ((SaludadorOOS)o).reset(), true);
+		/*
+		 * FIXME:
+		com.addAction("+", 
+				(o, x) -> (((SaludadorOOS)o).cambiaSaludo(String.format("%d + %d = %d", (int)x[0], (int)x[1], ((int)x[0])+((int)x[1]))));
+						  ((SaludadorOOS)o).saluda());
+		*/
 	}
 	
 	public static void main(String[] args) throws Exception {
