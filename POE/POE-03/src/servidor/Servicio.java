@@ -18,7 +18,6 @@ public class Servicio implements JuegoBarcos {
 	private final static String PATTERN_COORD = "^(\\p{Alpha}\\d{1,2}\\s*){2}$";
 
 	// Información común para todos los OOSs
-	private static int nClientes = 0;
 
 	// jugadores conectados al servicio y esperando para jugar
 	// (se requiere que el jugador haya colocado todos sus barcos)
@@ -43,12 +42,50 @@ public class Servicio implements JuegoBarcos {
 	/**
 	 * Crea un nuevo servicio
 	 */
-	public Servicio () {
-		this.estado = 0;
+	public Servicio (int id) {
+		// non-static
+		this.idClient = id;
+		this.barcosRestantes = new ArrayList<Integer> (BARCOS);
 		this.oceano = new Tablero ();
 		this.tiros  = new Tablero ();
-		this.barcosRestantes = new ArrayList<Integer> (DIMENSION);
-		this.idClient = ++nClientes;
+		this.estado = 0;
+		// static
+		oceanoJugadores.put(this.idClient, this.oceano);
+		barcosEnOceano.put(this.idClient, 0);
+		turnoJugador.put(this.idClient, false);
+	}
+
+	public String tableroBarcos () {
+		return this.oceano.toString();
+	}
+	
+	public String tableroTiros () {
+		return this.tiros.toString();
+	}
+
+	public List<Integer> barcosPorColocar () throws AccionNoPermitida {
+		if (this.estado != 0) {
+			throw new AccionNoPermitida("barcosPorColocar");
+		}
+		return this.barcosRestantes;
+	}
+
+	public int turno () throws AccionNoPermitida {
+		if (this.estado < 2) {
+			throw new AccionNoPermitida("turno");
+		}
+		if (this.estado == FINAL_JUEGO) {
+			return this.estado;
+		}
+		for (Map.Entry<Integer, Boolean> e : turnoJugador.entrySet()) {
+			if (e.getKey() == this.idClient) {
+				if (e.getValue()) {
+					return 1;
+				}
+				return 0;
+			}
+		}
+		return 0;
 	}
 
 	/**
@@ -82,6 +119,26 @@ public class Servicio implements JuegoBarcos {
 	}
 
 	@Override
+	public String coordenadasTiro (String tiro) throws AccionNoPermitida, CoordenadasNoValidas {
+		if (this.estado < 2 || this.estado == FINAL_JUEGO || !turnoJugador.get(this.idClient)) {
+			throw new AccionNoPermitida("coordenadasTiro");
+		}
+		Pair<Integer, Integer> pos = position(tiro);
+		for (Map.Entry<Integer, Tablero> e : oceanoJugadores.entrySet()) {
+			if (e.getKey() != this.estado) {
+				if (e.getValue().tiro(pos.first(), pos.second()).equals(Celda.AGUA_TORPEDEADA)) {
+					return "AGUA";
+				}
+				if (e.getValue().tiro(pos.first(), pos.second()).equals(Barco.TOCADO)) {
+					return "TOCADO";
+				}
+				return "HUNDIDO";
+			}
+		}
+		return "";
+	}
+
+	@Override
 	public void colocarBarco(String str)
 			throws CoordenadasNoValidas, BarcoMalPosicionado, TamanioBarcoNoValido, AccionNoPermitida {
 		if (this.estado != 0) {
@@ -101,10 +158,7 @@ public class Servicio implements JuegoBarcos {
 		matcher.find();
 		String str1 = matcher.group();
 
-		Pair<Integer, Integer> p0 = position(str0);
-		Pair<Integer, Integer> p1 = position(str1);
-
-		Integer size = this.oceano.colocarBarco(p0, p1, this.barcosRestantes);
+		Integer size = this.oceano.colocarBarco(position(str0), position(str1), this.barcosRestantes);
 
 		// se ha colocado un barco de tamaño size
 		this.barcosRestantes.remove(size);
@@ -118,6 +172,19 @@ public class Servicio implements JuegoBarcos {
 	 * del oponente
 	 */
 	private void actualizarEstado(boolean blanco) {
+		if (blanco && this.estado != 5) {
+			this.estado++;
+		} else {
+			this.estado = 2;
+		}
+	}
+
+	public int numBarcosEnOceano () {
+		int c = 0;
+		for (Map.Entry<Integer, Integer> e : barcosEnOceano.entrySet()) {
+			c+=e.getValue();
+		}
+		return c;
 	}
 
 	/*
@@ -174,6 +241,6 @@ public class Servicio implements JuegoBarcos {
 		oponente.put(this.idClient, idOponente);
 		turnoJugador.put(this.idClient, true);
 		this.estado = 2;
-		return this.estado == 2;
+		return true;
 	}
 }
