@@ -2,6 +2,7 @@ package cliente;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 import lib.ChannelException;
 import lib.CommClient;
@@ -70,14 +71,26 @@ public class Cliente {
 	} // numUsuarios
 
 	private static void cambiandoSaludo()
-			throws Exception {
+			throws IOException, ChannelException {
 		// Implementar esta operación: el texto del nuevo saludo deberá
 		// solicitarse por teclado y tratarse convenientemente todas las
 		// excepciones. Sólo se llevarán al main las excepciones críticas
 		// IOException y ChannelException para dar un mensaje de error y
 		// parar el cliente.
 
-		
+		com.sendEvent(new ProtocolMessages("cambiaSaludo", m.input().nextLine()));
+		//com.sendEvent(new ProtocolMessages("cambiaSaludo", "Hola Alex!"));
+		try {
+			com.processReply(com.waitReply());
+		} catch (AccionNoPermitida e) {
+			System.err.printf("Acción no permitida: %s\n", e.getMessage());
+		} catch (IOException | ChannelException e) {
+			throw e;
+		} catch (UnknownOperation e) {
+			System.err.printf("Acción desconocida: %s\n", e.getMessage());
+		} catch (Exception e) {
+			System.err.printf("%s: %s\n", e.getClass().getSimpleName(), e.getMessage());
+		}
 	} // cambiandoSaludo
 	
 	private static void msgReset()
@@ -94,12 +107,16 @@ public class Cliente {
     	m = new Menu("\nSaludador", "Opción ? ");
     	
     	// añadir al menú las opciones y la función anónima
-
+    	m.add("saluda", () -> saludame());
+    	m.add("cambiaSaludo", () -> cambiandoSaludo());
+    	m.add("nUsuarios", () -> numUsuarios());
+    	m.add("reset", () -> msgReset());
 	}	
 	
     public static void main(String[] args) {
     	// cambia el main para tratar todas las excepciones
     	
+    	try {
 		// 1. Crear el canal de comunicación y establecer la
 		// conexión con el servicio por defecto en localhost
 		com = new CommClient();
@@ -114,12 +131,23 @@ public class Cliente {
 		do {
 			;	
 		} while (m.runSelection());
-		// 4. Cerrar la entrada de la interfaz
-		m.close();
-		// cierra el canal de comunicación y
-		// 5. Desconectar el cliente
-		com.disconnect();
-		
+    	} catch (UnknownHostException e) {
+    		System.err.printf("Servidor desconocido: %s\n", e.getMessage());
+    		e.printStackTrace();
+    	} catch(IOException | ChannelException e) {
+    		System.err.printf("Error crítico: %s\n", e.getMessage());
+    		e.printStackTrace();
+    		System.exit(-1);
+    	} catch (Exception e) {
+    		System.err.printf("Error: %s\n", e.getMessage());
+    		e.printStackTrace();
+    	} finally {
+    		// 4. Cerrar la entrada de la interfaz
+    		m.close();
+			// cierra el canal de comunicación y
+			// 5. Desconectar el cliente
+			com.disconnect();
+    	}
 	} // main
 
 } // class Cliente

@@ -1,0 +1,2 @@
+S1: cambiaSaludo("Hola Alex!")
+R1: Exception!(AccionNoPermitida)
