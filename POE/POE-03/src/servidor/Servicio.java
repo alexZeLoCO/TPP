@@ -121,22 +121,26 @@ public class Servicio implements JuegoBarcos {
 	@Override
 	public String coordenadasTiro (String tiro) throws AccionNoPermitida, CoordenadasNoValidas {
 		if (this.estado < 2 || this.estado == FINAL_JUEGO || !turnoJugador.get(this.idClient)) {
-			throw new AccionNoPermitida("coordenadasTiro");
+			throw new AccionNoPermitida(String.format("coordenadasTiro | estado: %d", this.estado));
 		}
 		Pair<Integer, Integer> pos = position(tiro);
-		for (Map.Entry<Integer, Tablero> e : oceanoJugadores.entrySet()) {
-			if (e.getKey() != this.estado) {
-				if (e.getValue().tiro(pos.first(), pos.second()).equals(Celda.AGUA_TORPEDEADA)) {
-					return "AGUA";
-				}
-				if (e.getValue().tiro(pos.first(), pos.second()).equals(Barco.TOCADO)) {
-					return "TOCADO";
-				}
-				return "HUNDIDO";
-			}
+		if (pos.first() < 0 || pos.first() >= DIMENSION || pos.second() < 0 || pos.second() >= DIMENSION) {
+			throw new CoordenadasNoValidas(String.format("coordenadasTiro | coords: (%d, %d)", pos.first(), pos.second()));
 		}
-		return "";
-	}
+		if (oceanoJugadores.get(oponente.get(this.idClient)).tiro(pos.first(), pos.second()) == (Celda.AGUA_TORPEDEADA)) {
+			// Agua
+			this.tiros.tabla[pos.first()][pos.second()] = Celda.AGUA_TORPEDEADA;
+			return "AGUA";
+		}
+		if (oceanoJugadores.get(oponente.get(this.idClient)).tiro(pos.first(), pos.second()) == (Barco.TOCADO)) {
+			// Tocado
+			this.tiros.tabla[pos.first()][pos.second()] = Barco.TOCADO;
+			return "TOCADO";
+		}
+		// Hundido
+		this.tiros.registrarBarco(((Barco)oceanoJugadores.get(oponente.get(this.idClient)).tiro(pos.first(), pos.second())));
+		return "HUNDIDO";
+	} // coordenadasTiro
 
 	@Override
 	public void colocarBarco(String str)
@@ -242,5 +246,18 @@ public class Servicio implements JuegoBarcos {
 		turnoJugador.put(this.idClient, true);
 		this.estado = 2;
 		return true;
+	}
+	
+	@Override
+	public void close () {
+		// ? 
+		turnoJugador.put(this.idClient, false);
+		turnoJugador.put(oponente.get(this.idClient), true);
+		// ?
+		barcosEnOceano.remove(this.idClient);
+		turnoJugador.remove(this.idClient);
+		oponente.remove(this.idClient);
+		oceanoJugadores.remove(this.idClient);
+		JuegoBarcos.super.close();
 	}
 }
