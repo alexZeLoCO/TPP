@@ -15,7 +15,7 @@ public class Cliente {
 	private static Menu m;
 	
 	private static void nBarcos () throws IOException, ChannelException {
-		com.sendEvent(new ProtocolMessages("numBarcosEnOceano"));
+		com.sendEvent(new ProtocolMessages("nBarcos"));
 		try {
 			System.out.println(com.processReply(com.waitReply()));
 		} catch (ClassNotFoundException e) {
@@ -29,16 +29,92 @@ public class Cliente {
 		}
 	}
 
+	private static void barcosPorColocar () throws IOException, ChannelException {
+		com.sendEvent(new ProtocolMessages("barcosPorColocar"));
+		try {
+			System.out.println(com.processReply(com.waitReply()));
+		} catch (ClassNotFoundException e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (UnknownOperation e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (IOException | ChannelException e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (Exception e) {
+			System.err.printf("%s: %s\n", e.getClass().getSimpleName(), e.getMessage());
+		}
+	}
+
+	private static void colocarBarco () throws IOException, ChannelException {
+		System.out.println("Plantilla: A 1");
+		com.sendEvent(new ProtocolMessages("colocarBarco", m.input().nextLine()));
+		tableroBarcos();
+		try {
+			System.out.println(com.processReply(com.waitReply()));
+		} catch (ClassNotFoundException e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (UnknownOperation e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (IOException | ChannelException e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (Exception e) {
+			System.err.printf("%s: %s\n", e.getClass().getSimpleName(), e.getMessage());
+		}
+	}
+
+	private static void tableroBarcos () throws IOException, ChannelException {
+		com.sendEvent(new ProtocolMessages("tableroBarcos"));
+		try {
+			System.out.println(com.processReply(com.waitReply()));
+		} catch (ClassNotFoundException e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (UnknownOperation e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (IOException | ChannelException e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (Exception e) {
+			System.err.printf("%s: %s\n", e.getClass().getSimpleName(), e.getMessage());
+		}
+	}
+
+	private static void iniciarJuego() throws IOException, ChannelException {
+		com.sendEvent(new ProtocolMessages("iniciarJuego"));
+		try {
+			System.out.println(com.processReply(com.waitReply()));
+		} catch (ClassNotFoundException e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (UnknownOperation e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (IOException | ChannelException e) {
+			System.err.printf("Recibido del servidor: %s\n", e.getMessage());
+		} catch (Exception e) {
+			System.err.printf("%s: %s\n", e.getClass().getSimpleName(), e.getMessage());
+		}
+	}
+
+	private static void estado () {
+		try {
+		com.sendEvent(new ProtocolMessages("estado"));
+		} catch (ChannelException | IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void interfazCliente () {
-		m = new Menu ("\nJuego de Barcos", "Opcion ? ");
+		m = new Menu ("\nJuego de Barcos", "Opcion Action? ");
 		
 		m.add("Numero de barcos en el oceano", () -> nBarcos());
-		m.add("");
+		m.add("Barcos por colocar", () -> barcosPorColocar());
+		m.add("Colocar barco", () -> colocarBarco());
+		m.add("Ver tablero", () -> tableroBarcos());
+		m.add("Iniciar Juego", () -> iniciarJuego());
+		m.add("Estado", () -> estado());
 	}
+
 	public static void main (String[] args) {
 		try {
 			com = new CommClient();
 			com.activateMessageLog();
+			interfazCliente();
 			
 			do {
 				;

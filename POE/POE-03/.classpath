@@ -6,11 +6,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="D:/EPI/2/2/TPP/POE/POE_library.jar" sourcepath="D:/EPI/2/2/TPP/POE/POE_library.jar"/>
-	<classpathentry kind="lib" path="D:/EPI/2/2/TPP/POE/3/componentes.jar" sourcepath="D:/EPI/2/2/TPP/POE/3/componentes.jar">
-		<attributes>
-			<attribute name="source_encoding" value="UTF-8"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="E:/EPI/2/2/TPP/POE/POE_library.jar"/>
+	<classpathentry kind="lib" path="E:/EPI/2/2/TPP/POE/3/componentes.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

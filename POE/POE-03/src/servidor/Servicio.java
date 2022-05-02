@@ -55,6 +55,10 @@ public class Servicio implements JuegoBarcos {
 		turnoJugador.put(this.idClient, false);
 	}
 
+	public String datos () {
+		return String.format("%s\n%s", oponente.toString(), turnoJugador.toString());
+	}
+
 	public String tableroBarcos () {
 		return this.oceano.toString();
 	}
@@ -77,15 +81,7 @@ public class Servicio implements JuegoBarcos {
 		if (this.estado == FINAL_JUEGO) {
 			return this.estado;
 		}
-		for (Map.Entry<Integer, Boolean> e : turnoJugador.entrySet()) {
-			if (e.getKey() == this.idClient) {
-				if (e.getValue()) {
-					return 1;
-				}
-				return 0;
-			}
-		}
-		return 0;
+		return turnoJugador.get(this.idClient) ? 1 : 0;
 	}
 
 	/**
@@ -167,6 +163,9 @@ public class Servicio implements JuegoBarcos {
 		// se ha colocado un barco de tamaño size
 		this.barcosRestantes.remove(size);
 		barcosEnOceano.put(this.idClient, barcosEnOceano.get(this.idClient) + 1);
+		if (this.barcosRestantes.isEmpty()) {
+			this.estado = 1;
+		}
 	}
 
 	/**
@@ -227,19 +226,23 @@ public class Servicio implements JuegoBarcos {
 			throw new AccionNoPermitida("iniciarJuego");
 		}
 		if (oponente.get(idClient) != null) {
+			System.out.println("A");
 			this.estado = 2;
 			return true;
 		}
 		if (jugadoresEnEspera.isEmpty()) {
+			System.out.println("B");
 			jugadoresEnEspera.add(this.idClient);	// Lista vacia, jugador tiene que esperar
 			return this.estado == 2;
 		}
 		if (jugadoresEnEspera.contains(this.idClient)) {
 			if (jugadoresEnEspera.size() == 1) {
+				System.out.println("C");
 				return false;	// Jugador solo en la lista
 			}
 			jugadoresEnEspera.remove((Integer)this.idClient);	// Jugador en lista con otro jugador
 		}
+		System.out.println("D");
 		int idOponente = jugadoresEnEspera.remove(0);
 		oponente.put(idOponente, this.idClient);
 		oponente.put(this.idClient, idOponente);
