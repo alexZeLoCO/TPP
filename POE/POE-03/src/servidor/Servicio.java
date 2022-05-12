@@ -56,7 +56,7 @@ public class Servicio implements JuegoBarcos {
 	}
 
 	public String datos () {
-		return String.format("%s\n%s", oponente.toString(), turnoJugador.toString());
+		return String.format("%s\n%s\n%d", oponente.toString(), turnoJugador.toString(), this.estado);
 	}
 
 	public String tableroBarcos () {
@@ -68,7 +68,7 @@ public class Servicio implements JuegoBarcos {
 	}
 
 	public List<Integer> barcosPorColocar () throws AccionNoPermitida {
-		if (this.estado != 0) {
+		if (this.estado > 1) {
 			throw new AccionNoPermitida("barcosPorColocar");
 		}
 		return this.barcosRestantes;
@@ -78,10 +78,22 @@ public class Servicio implements JuegoBarcos {
 		if (this.estado < 2) {
 			throw new AccionNoPermitida("turno");
 		}
+		if (barcosEnOceano.get(this.idClient) == 0 || barcosEnOceano.get(oponente.get(this.idClient)) == 0) {
+			return FINAL_JUEGO;
+		}
 		if (this.estado == FINAL_JUEGO) {
 			return this.estado;
 		}
-		return turnoJugador.get(this.idClient) ? 1 : 0;
+		if (this.estado == 2) {
+			// synchronized (nextTurno.get(this.idClient)) {
+			if (turnoJugador.get(this.idClient)) {
+				this.estado = 3;
+			} else {
+				return 0;
+			}
+			// }
+		}
+		return 1;
 	}
 
 	/**
@@ -123,18 +135,25 @@ public class Servicio implements JuegoBarcos {
 		if (pos.first() < 0 || pos.first() >= DIMENSION || pos.second() < 0 || pos.second() >= DIMENSION) {
 			throw new CoordenadasNoValidas(String.format("coordenadasTiro | coords: (%d, %d)", pos.first(), pos.second()));
 		}
-		if (oceanoJugadores.get(oponente.get(this.idClient)).tiro(pos.first(), pos.second()) == (Celda.AGUA_TORPEDEADA)) {
+		Celda objetivo = oceanoJugadores.get(oponente.get(this.idClient)).tiro(pos.first(), pos.second());
+		if (objetivo == (Celda.AGUA) || objetivo == (Celda.AGUA_TORPEDEADA)) {
 			// Agua
 			this.tiros.tabla[pos.first()][pos.second()] = Celda.AGUA_TORPEDEADA;
+			this.actualizarEstado(false);
 			return "AGUA";
 		}
-		if (oceanoJugadores.get(oponente.get(this.idClient)).tiro(pos.first(), pos.second()) == (Barco.TOCADO)) {
+		if (objetivo == (Barco.TOCADO)) {
 			// Tocado
 			this.tiros.tabla[pos.first()][pos.second()] = Barco.TOCADO;
+			this.actualizarEstado(true);
 			return "TOCADO";
 		}
 		// Hundido
-		this.tiros.registrarBarco(((Barco)oceanoJugadores.get(oponente.get(this.idClient)).tiro(pos.first(), pos.second())));
+		// System.out.println((objetivo instanceof Barco) ? objetivo.toString() : ((Barco) objetivo).toString());
+		this.tiros.registrarBarco((Barco) objetivo);
+		this.actualizarEstado(true);
+		barcosEnOceano.put(this.idClient, barcosEnOceano.get(this.idClient) - 1);
+		System.out.println(barcosEnOceano.get(oponente.get(this.idClient)).toString());
 		return "HUNDIDO";
 	} // coordenadasTiro
 
@@ -175,19 +194,20 @@ public class Servicio implements JuegoBarcos {
 	 * del oponente
 	 */
 	private void actualizarEstado(boolean blanco) {
+		if (barcosEnOceano.get(this.idClient) == 0) {
+			this.estado = FINAL_JUEGO;
+		}
 		if (blanco && this.estado != 5) {
 			this.estado++;
 		} else {
+			turnoJugador.put(this.idClient, false);
+			turnoJugador.put(oponente.get(this.idClient), true);
 			this.estado = 2;
 		}
 	}
 
 	public int numBarcosEnOceano () {
-		int c = 0;
-		for (Map.Entry<Integer, Integer> e : barcosEnOceano.entrySet()) {
-			c+=e.getValue();
-		}
-		return c;
+		return barcosEnOceano.get(this.idClient);
 	}
 
 	/*
@@ -226,41 +246,45 @@ public class Servicio implements JuegoBarcos {
 			throw new AccionNoPermitida("iniciarJuego");
 		}
 		if (oponente.get(idClient) != null) {
-			System.out.println("A");
 			this.estado = 2;
 			return true;
 		}
 		if (jugadoresEnEspera.isEmpty()) {
-			System.out.println("B");
 			jugadoresEnEspera.add(this.idClient);	// Lista vacia, jugador tiene que esperar
 			return this.estado == 2;
 		}
 		if (jugadoresEnEspera.contains(this.idClient)) {
 			if (jugadoresEnEspera.size() == 1) {
-				System.out.println("C");
 				return false;	// Jugador solo en la lista
 			}
 			jugadoresEnEspera.remove((Integer)this.idClient);	// Jugador en lista con otro jugador
 		}
-		System.out.println("D");
 		int idOponente = jugadoresEnEspera.remove(0);
 		oponente.put(idOponente, this.idClient);
 		oponente.put(this.idClient, idOponente);
 		turnoJugador.put(this.idClient, true);
-		this.estado = 2;
+		turnoJugador.put(idOponente, false);
+		this.estado = 3;
 		return true;
 	}
 	
 	@Override
 	public void close () {
-		// ? 
-		turnoJugador.put(this.idClient, false);
-		turnoJugador.put(oponente.get(this.idClient), true);
-		// ?
-		barcosEnOceano.remove(this.idClient);
-		turnoJugador.remove(this.idClient);
-		oponente.remove(this.idClient);
+		if (this.estado < 2) {
+			jugadoresEnEspera.remove(this.idClient);
+		}
+		int idOponente = oponente.get(this.idClient);
+		if (oponente.get(idOponente) != null) {
+			turnoJugador.put(oponente.get(idOponente), true);
+		} else {
 		oceanoJugadores.remove(this.idClient);
+		oceanoJugadores.remove(idOponente);
+		barcosEnOceano.remove(this.idClient);
+		barcosEnOceano.remove(idOponente);
+		turnoJugador.remove(this.idClient);
+		turnoJugador.remove(idOponente);
+		}
+		oponente.remove(this.idClient);
 		JuegoBarcos.super.close();
 	}
 }

@@ -11,15 +11,20 @@ public class Servidor {
 	private static void registrarOperaciones (CommServer com) {
 		com.addFunction("nBarcos", 
 				(o, x) -> ((Servicio)o).numBarcosEnOceano());
-		com.addAction("colocarBarco", 
-				(o, x) -> ((Servicio)o).colocarBarco((String) (x[0])));
 		com.addFunction("barcosPorColocar",
 				(o, x) -> ((Servicio)o).barcosPorColocar()); 
 		com.addFunction("tableroBarcos", 
 				(o, x) -> ((Servicio)o).tableroBarcos());
-		com.addAction("iniciarJuego", 
+		com.addAction("colocarBarco", 
+				(o, x) -> ((Servicio)o).colocarBarco((String) x[0]));
+		com.addFunction("iniciarJuego",
 				(o, x) -> ((Servicio)o).iniciarJuego());
-		com.addAction("estado", (o, x) -> System.out.println(((Servicio)o).datos()));
+		com.addFunction("turno", 
+				(o, x) -> ((Servicio)o).turno());
+		com.addFunction("tirar",
+				(o, x) -> ((Servicio)o).coordenadasTiro((String) x[0]));
+		com.addFunction("tableroTiros",
+				(o, x) -> ((Servicio)o).tableroTiros());
 	}
 	
 	public static void main (String[] args) {
